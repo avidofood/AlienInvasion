@@ -1,0 +1,29 @@
+{
+  "name": "foodinvasion",
+  "version": "1.0.0",
+  "description": "A simple game based on Aliens transformed to Food",
+  "main": "src/index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/avidofood/FoodInvasion.git"
+  },
+  "keywords": [
+    "FoodInvasion",
+    "AlienInvasion",
+    "OfflineGame",
+    "JavasScript"
+  ],
+  "author": "cykod",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/avidofood/FoodInvasion/issues"
+  },
+  "homepage": "https://github.com/avidofood/FoodInvasion#readme",
+  "devDependencies": {
+    "eslint": "^5.16.0",
+    "eslint-config-avidofood": "^1.0.1"
+  }
+}
