@@ -1,3 +1,4 @@
+/* eslint-disable no-param-reassign */
 /* eslint-disable no-alert */
 /* eslint-disable func-names */
 import spritesImages from './images/sprites.png';
@@ -121,52 +122,54 @@ const Game = new function () {
     };
 }();
 
+
+const SpriteSheet = new function () {
+    this.map = { };
+
+    this.load = function (spriteData, callback) {
+        this.map = spriteData;
+        this.image = new Image();
+        this.image.onload = callback;
+        this.image.src = spritesImages;
+    };
+
+    this.draw = function (ctx, sprite, x, y, frame) {
+        const s = this.map[sprite];
+        if (!frame) frame = 0;
+        ctx.drawImage(this.image,
+            s.sx + frame * s.w,
+            s.sy,
+            s.w, s.h,
+            Math.floor(x), Math.floor(y),
+            s.w, s.h);
+    };
+
+    return this;
+}();
+
+
+const TitleScreen = function TitleScreen(title, subtitle, callback) {
+    let up = false;
+    // eslint-disable-next-line no-unused-vars
+    this.step = function (dt) {
+        if (!Game.keys.fire) up = true;
+        if (up && Game.keys.fire && callback) callback();
+    };
+
+    this.draw = function (ctx) {
+        ctx.fillStyle = '#FFFFFF';
+
+        ctx.font = 'bold 40px bangers';
+        const measure = ctx.measureText(title);
+        ctx.fillText(title, Game.width / 2 - measure.width / 2, Game.height / 2);
+
+        ctx.font = 'bold 20px bangers';
+        const measure2 = ctx.measureText(subtitle);
+        ctx.fillText(subtitle, Game.width / 2 - measure2.width / 2, Game.height / 2 + 40);
+    };
+};
+
 /* eslint-disable */
-
-var SpriteSheet = new function() {
-  this.map = { }; 
-
-  this.load = function(spriteData,callback) { 
-    this.map = spriteData;
-    this.image = new Image();
-    this.image.onload = callback;
-    this.image.src = spritesImages;
-  };
-
-  this.draw = function(ctx,sprite,x,y,frame) {
-    var s = this.map[sprite];
-    if(!frame) frame = 0;
-    ctx.drawImage(this.image,
-                     s.sx + frame * s.w, 
-                     s.sy, 
-                     s.w, s.h, 
-                     Math.floor(x), Math.floor(y),
-                     s.w, s.h);
-  };
-
-  return this;
-};
-
-var TitleScreen = function TitleScreen(title,subtitle,callback) {
-  var up = false;
-  this.step = function(dt) {
-    if(!Game.keys['fire']) up = true;
-    if(up && Game.keys['fire'] && callback) callback();
-  };
-
-  this.draw = function(ctx) {
-    ctx.fillStyle = "#FFFFFF";
-
-    ctx.font = "bold 40px bangers";
-    var measure = ctx.measureText(title);  
-    ctx.fillText(title,Game.width/2 - measure.width/2,Game.height/2);
-
-    ctx.font = "bold 20px bangers";
-    var measure2 = ctx.measureText(subtitle);
-    ctx.fillText(subtitle,Game.width/2 - measure2.width/2,Game.height/2 + 40);
-  };
-};
-
 
 var GameBoard = function() {
   var board = this;
