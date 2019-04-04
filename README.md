@@ -3,7 +3,7 @@
 [![Total Downloads on NPM](https://img.shields.io/npm/dt/%40pmochine%2Fvee-validate-laravel.svg)](https://www.npmjs.com/package/%40pmochine%2Fvee-validate-laravel)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 
-![Alien Food Invasion](https://baianat.github.io/vee-validate/logo.png)
+![Alien Food Invasion](src/images/preview.jpg)
 
 **If you are looking for an easy game for example when the Browser is offline and the User needs to wait, this package is for you. 😜**
 
