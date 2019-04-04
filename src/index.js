@@ -5,8 +5,4 @@
 
 import { startPlaying } from './game';
 
-window.addEventListener('load', () => {
-    window.events.$on('start-game', () => {
-        startPlaying();
-    });
-});
+export default startPlaying;
