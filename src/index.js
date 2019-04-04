@@ -416,41 +416,60 @@ const TouchControls = function () {
     Game.playerOffset = unitWidth + 20;
 };
 
-/* eslint-disable */
 
-var GamePoints = function() {
-  Game.points = 0;
+const GamePoints = function () {
+    Game.points = 0;
 
-  var pointsLength = 8;
+    const pointsLength = 8;
 
-  this.draw = function(ctx) {
-    ctx.save();
-    ctx.font = "bold 18px arial";
-    ctx.fillStyle= "#FFFFFF";
+    this.draw = function (ctx) {
+        ctx.save();
+        ctx.font = 'bold 18px arial';
+        ctx.fillStyle = '#FFFFFF';
 
-    var txt = "" + Game.points;
-    var i = pointsLength - txt.length, zeros = "";
-    while(i-- > 0) { zeros += "0"; }
+        const txt = `${Game.points}`;
+        let i = pointsLength - txt.length;
+        let zeros = '';
 
-    ctx.fillText(zeros + txt,10,20);
-    ctx.restore();
+        // eslint-disable-next-line no-cond-assign
+        while (i -= 1 > 0) {
+            zeros += '0';
+        }
 
-  };
+        ctx.fillText(zeros + txt, 10, 20);
+        ctx.restore();
+    };
 
-  this.step = function(dt) { };
+    this.step = function (dt) { };
 };
 
-var sprites = {
-    ship: { sx: 0, sy: 0, w: 37, h: 42, frames: 1 },
-    missile: { sx: 0, sy: 30, w: 2, h: 10, frames: 1 },
-    enemy_purple: { sx: 37, sy: 0, w: 42, h: 43, frames: 1 },
-    enemy_bee: { sx: 79, sy: 0, w: 37, h: 43, frames: 1 },
-    enemy_ship: { sx: 116, sy: 0, w: 42, h: 36, frames: 1 },
-    enemy_circle: { sx: 158, sy: 0, w: 33, h: 36, frames: 1 },
-    explosion: { sx: 0, sy: 64, w: 64, h: 64, frames: 12 },
-    enemy_missile: { sx: 9, sy: 42, w: 3, h: 20, frame: 1, }
-   };
-   
+const sprites = {
+    ship: {
+        sx: 0, sy: 0, w: 37, h: 42, frames: 1,
+    },
+    missile: {
+        sx: 0, sy: 30, w: 2, h: 10, frames: 1,
+    },
+    enemy_purple: {
+        sx: 37, sy: 0, w: 42, h: 43, frames: 1,
+    },
+    enemy_bee: {
+        sx: 79, sy: 0, w: 37, h: 43, frames: 1,
+    },
+    enemy_ship: {
+        sx: 116, sy: 0, w: 42, h: 36, frames: 1,
+    },
+    enemy_circle: {
+        sx: 158, sy: 0, w: 33, h: 36, frames: 1,
+    },
+    explosion: {
+        sx: 0, sy: 64, w: 64, h: 64, frames: 12,
+    },
+    enemy_missile: {
+        sx: 9, sy: 42, w: 3, h: 20, frame: 1,
+    },
+};
+/* eslint-disable */
    var enemies = {
      straight: { x: 0,   y: -50, sprite: 'enemy_ship', health: 10, 
                  E: 100 },
