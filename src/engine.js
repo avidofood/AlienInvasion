@@ -1,16 +1,10 @@
-/* eslint-disable guard-for-in */
-/* eslint-disable func-names */
 /* eslint-disable no-unused-vars */
-/* eslint-disable consistent-return */
-/* eslint-disable no-plusplus */
-/* eslint-disable no-cond-assign */
 /* eslint-disable no-param-reassign */
+/* eslint-disable no-alert */
+/* eslint-disable func-names */
+import spritesImages from './sprites';
 
-
-import sprites from './images/sprites.png';
-import './base.css';
-
-const Game = new function () {
+export const Game = new function () {
     const boards = [];
 
     // Game Initialization
@@ -25,7 +19,9 @@ const Game = new function () {
         this.height = this.canvas.height;
 
         this.ctx = this.canvas.getContext && this.canvas.getContext('2d');
+
         if (!this.ctx) {
+            alert('Please upgrade your browser to play');
             return;
         }
 
@@ -71,7 +67,7 @@ const Game = new function () {
         let dt = (curTime - lastTime) / 1000;
         if (dt > maxTime) { dt = maxTime; }
 
-        for (let i = 0, len = boards.length; i < len; i++) {
+        for (let i = 0, len = boards.length; i < len; i += 1) {
             if (boards[i]) {
                 boards[i].step(dt);
                 boards[i].draw(Game.ctx);
@@ -85,17 +81,16 @@ const Game = new function () {
 
 
     this.setupMobile = function () {
-        const container = document.getElementById('container');
+        const container = document.getElementById('game-container');
         const hasTouch = !!('ontouchstart' in window);
-        let w = window.innerWidth; let
-            h = window.innerHeight;
+        let w = window.innerWidth;
+        let h = window.innerHeight;
 
         if (hasTouch) { this.mobile = true; }
 
-        if (window.screen.width >= 1280 || !hasTouch) { return false; }
+        if (window.screen.width >= 1280 || !hasTouch) return;
 
         if (w > h) {
-            // eslint-disable-next-line no-alert
             alert('Please rotate the device and then click OK');
             w = window.innerWidth; h = window.innerHeight;
         }
@@ -126,222 +121,7 @@ const Game = new function () {
 }();
 
 
-let SpriteSheet = new function () {
-    this.map = { };
-
-    this.load = function (spriteData, callback) {
-        this.map = spriteData;
-        this.image = new Image();
-        this.image.onload = callback;
-        this.image.src = sprites;
-    };
-
-    this.draw = function (ctx, sprite, x, y, frame) {
-        const s = this.map[sprite];
-        if (!frame) frame = 0;
-        ctx.drawImage(this.image,
-            s.sx + frame * s.w,
-            s.sy,
-            s.w, s.h,
-            Math.floor(x), Math.floor(y),
-            s.w, s.h);
-    };
-
-    return this;
-}();
-
-const TitleScreen = function TitleScreen(title, subtitle, callback) {
-    let up = false;
-    this.step = function (dt) {
-        if (!Game.keys.fire) up = true;
-        if (up && Game.keys.fire && callback) callback();
-    };
-
-    this.draw = function (ctx) {
-        ctx.fillStyle = '#FFFFFF';
-
-        ctx.font = 'bold 40px bangers';
-        const measure = ctx.measureText(title);
-        ctx.fillText(title, Game.width / 2 - measure.width / 2, Game.height / 2);
-
-        ctx.font = 'bold 20px bangers';
-        const measure2 = ctx.measureText(subtitle);
-        ctx.fillText(subtitle, Game.width / 2 - measure2.width / 2, Game.height / 2 + 40);
-    };
-};
-
-
-const GameBoard = function () {
-    const board = this;
-
-    // The current list of objects
-    this.objects = [];
-    this.cnt = {};
-
-    // Add a new object to the object list
-    this.add = function (obj) {
-        obj.board = this;
-        this.objects.push(obj);
-        this.cnt[obj.type] = (this.cnt[obj.type] || 0) + 1;
-        return obj;
-    };
-
-    // Mark an object for removal
-    this.remove = function (obj) {
-        const idx = this.removed.indexOf(obj);
-        if (idx === -1) {
-            this.removed.push(obj);
-            return true;
-        }
-        return false;
-    };
-
-    // Reset the list of removed objects
-    this.resetRemoved = function () { this.removed = []; };
-
-    // Removed an objects marked for removal from the list
-    this.finalizeRemoved = function () {
-        for (let i = 0, len = this.removed.length; i < len; i++) {
-            const idx = this.objects.indexOf(this.removed[i]);
-            if (idx !== -1) {
-                this.cnt[this.removed[i].type] -= 1;
-                this.objects.splice(idx, 1);
-            }
-        }
-    };
-
-    // Call the same method on all current objects
-    this.iterate = function (funcName, ...args) {
-        // const args = Array.prototype.slice.call(arguments, 1);
-        for (let i = 0, len = this.objects.length; i < len; i++) {
-            const obj = this.objects[i];
-            obj[funcName](obj, ...args);
-        }
-    };
-
-    // Find the first object for which func is true
-    this.detect = function (func) {
-        for (let i = 0, val = null, len = this.objects.length; i < len; i++) {
-            if (func.call(this.objects[i])) return this.objects[i];
-        }
-        return false;
-    };
-
-    // Call step on all objects and them delete
-    // any object that have been marked for removal
-    this.step = function (dt) {
-        this.resetRemoved();
-        this.iterate('step', dt);
-        this.finalizeRemoved();
-    };
-
-    // Draw all the objects
-    this.draw = function (ctx) {
-        this.iterate('draw', ctx);
-    };
-
-    // Check for a collision between the
-    // bounding rects of two objects
-    this.overlap = function (o1, o2) {
-        return !((o1.y + o1.h - 1 < o2.y) || (o1.y > o2.y + o2.h - 1)
-             || (o1.x + o1.w - 1 < o2.x) || (o1.x > o2.x + o2.w - 1));
-    };
-
-    // Find the first object that collides with obj
-    // match against an optional type
-    this.collide = function (obj, type) {
-        return this.detect(function () {
-            if (obj !== this) {
-                // eslint-disable-next-line no-bitwise
-                const col = (!type || this.type & type) && board.overlap(obj, this);
-                return col ? this : false;
-            }
-        });
-    };
-};
-
-const Sprite = function () { };
-
-Sprite.prototype.setup = function (sprite, props) {
-    this.sprite = sprite;
-    this.merge(props);
-    this.frame = this.frame || 0;
-    this.w = SpriteSheet.map[sprite].w;
-    this.h = SpriteSheet.map[sprite].h;
-};
-
-Sprite.prototype.merge = function (props) {
-    if (props) {
-        // eslint-disable-next-line no-restricted-syntax
-        for (const prop in props) {
-            this[prop] = props[prop];
-        }
-    }
-};
-
-Sprite.prototype.draw = function (ctx) {
-    SpriteSheet.draw(ctx, this.sprite, this.x, this.y, this.frame);
-};
-
-Sprite.prototype.hit = function (damage) {
-    this.board.remove(this);
-};
-
-
-const Level = function (levelData, callback) {
-    this.levelData = [];
-    for (let i = 0; i < levelData.length; i++) {
-        this.levelData.push(Object.create(levelData[i]));
-    }
-    this.t = 0;
-    this.callback = callback;
-};
-
-Level.prototype.step = function (dt) {
-    let idx = 0; const remove = []; let
-        curShip = null;
-
-    // Update the current time offset
-    this.t += dt * 1000;
-
-    //   Start, End,  Gap, Type,   Override
-    // [ 0,     4000, 500, 'step', { x: 100 } ]
-    while ((curShip = this.levelData[idx])
-        && (curShip[0] < this.t + 2000)) {
-    // Check if we've passed the end time
-        if (this.t > curShip[1]) {
-            remove.push(curShip);
-        } else if (curShip[0] < this.t) {
-            // Get the enemy definition blueprint
-            const enemy = enemies[curShip[3]];
-            const override = curShip[4];
-
-            // Add a new enemy with the blueprint and override
-            this.board.add(new Enemy(enemy, override));
-
-            // Increment the start time by the gap
-            curShip[0] += curShip[2];
-        }
-        idx += 1;
-    }
-
-    // Remove any objects from the levelData that have passed
-    for (let i = 0, len = remove.length; i < len; i++) {
-        const remIdx = this.levelData.indexOf(remove[i]);
-        if (remIdx !== -1) this.levelData.splice(remIdx, 1);
-    }
-
-    // If there are no more enemies on the board or in
-    // levelData, this level is done
-    if (this.levelData.length === 0 && this.board.cnt[OBJECT_ENEMY] === 0) {
-        if (this.callback) this.callback();
-    }
-};
-
-Level.prototype.draw = function () { };
-
-
-let TouchControls = function () {
+const TouchControls = function () {
     const gutterWidth = 10;
     const unitWidth = Game.width / 5;
     const blockWidth = unitWidth - gutterWidth;
@@ -373,16 +153,16 @@ let TouchControls = function () {
         ctx.restore();
     };
 
-    this.step = function () { };
+    this.step = function (dt) { };
 
     this.trackTouch = function (e) {
-        let touch;
-        let x;
+        let touch; let
+            x;
 
         e.preventDefault();
         Game.keys.left = false;
         Game.keys.right = false;
-        for (let i = 0; i < e.targetTouches.length; i++) {
+        for (let i = 0; i < e.targetTouches.length; i += 1) {
             touch = e.targetTouches[i];
             x = touch.pageX / Game.canvasMultiplier - Game.canvas.offsetLeft;
             if (x < unitWidth) {
@@ -394,7 +174,7 @@ let TouchControls = function () {
         }
 
         if (e.type === 'touchstart' || e.type === 'touchend') {
-            for (i = 0; i < e.changedTouches.length; i++) {
+            for (i = 0; i < e.changedTouches.length; i += 1) {
                 touch = e.changedTouches[i];
                 x = touch.pageX / Game.canvasMultiplier - Game.canvas.offsetLeft;
                 if (x > 4 * unitWidth) {
@@ -416,24 +196,51 @@ let TouchControls = function () {
 };
 
 
-const GamePoints = function () {
-    Game.points = 0;
+const SpriteSheet = new function () {
+    this.map = { };
 
-    const pointsLength = 8;
-
-    this.draw = function (ctx) {
-        ctx.save();
-        ctx.font = 'bold 18px arial';
-        ctx.fillStyle = '#FFFFFF';
-
-        const txt = `${Game.points}`;
-        let i = pointsLength - txt.length; let
-            zeros = '';
-        while (i-- > 0) { zeros += '0'; }
-
-        ctx.fillText(zeros + txt, 10, 20);
-        ctx.restore();
+    this.load = function (spriteData, callback) {
+        this.map = spriteData;
+        this.image = spritesImages; // loaded before on top!
+        callback();
     };
 
-    this.step = function () { };
+    this.draw = function (ctx, sprite, x, y, frame) {
+        const s = this.map[sprite];
+        if (!frame) frame = 0;
+        ctx.drawImage(this.image,
+            s.sx + frame * s.w,
+            s.sy,
+            s.w, s.h,
+            Math.floor(x), Math.floor(y),
+            s.w, s.h);
+    };
+
+    return this;
+}();
+
+export const Sprite = function () { };
+
+Sprite.prototype.setup = function (sprite, props) {
+    this.sprite = sprite;
+    this.merge(props);
+    this.frame = this.frame || 0;
+    this.w = SpriteSheet.map[sprite].w;
+    this.h = SpriteSheet.map[sprite].h;
+};
+
+Sprite.prototype.merge = function (props) {
+    if (props) {
+        Object.keys(props).forEach((prop) => {
+            this[prop] = props[prop];
+        });
+    }
+};
+
+Sprite.prototype.draw = function (ctx) {
+    SpriteSheet.draw(ctx, this.sprite, this.x, this.y, this.frame);
+};
+
+Sprite.prototype.hit = function () {
+    this.board.remove(this);
 };
