@@ -770,43 +770,42 @@ Enemy.prototype.hit = function (damage) {
         }
     }
 };
-/* eslint-disable */ 
-   var EnemyMissile = function(x,y) {
-     this.setup('enemy_missile',{ vy: 200, damage: 10 });
-     this.x = x - this.w/2;
-     this.y = y;
-   };
-   
-   EnemyMissile.prototype = new Sprite();
-   EnemyMissile.prototype.type = OBJECT_ENEMY_PROJECTILE;
-   
-   EnemyMissile.prototype.step = function(dt)  {
-     this.y += this.vy * dt;
-     var collision = this.board.collide(this,OBJECT_PLAYER)
-     if(collision) {
-       collision.hit(this.damage);
-       this.board.remove(this);
-     } else if(this.y > Game.height) {
-         this.board.remove(this); 
-     }
-   };
-   
-   
-   
-   var Explosion = function(centerX,centerY) {
-     this.setup('explosion', { frame: 0 });
-     this.x = centerX - this.w/2;
-     this.y = centerY - this.h/2;
-   };
-   
-   Explosion.prototype = new Sprite();
-   
-   Explosion.prototype.step = function(dt) {
-     this.frame++;
-     if(this.frame >= 12) {
-       this.board.remove(this);
-     }
-   };
+
+const EnemyMissile = function (x, y) {
+    this.setup('enemy_missile', { vy: 200, damage: 10 });
+    this.x = x - this.w / 2;
+    this.y = y;
+};
+
+EnemyMissile.prototype = new Sprite();
+EnemyMissile.prototype.type = OBJECT_ENEMY_PROJECTILE;
+
+EnemyMissile.prototype.step = function (dt) {
+    this.y += this.vy * dt;
+    const collision = this.board.collide(this, OBJECT_PLAYER);
+    if (collision) {
+        collision.hit(this.damage);
+        this.board.remove(this);
+    } else if (this.y > Game.height) {
+        this.board.remove(this);
+    }
+};
+
+
+const Explosion = function (centerX, centerY) {
+    this.setup('explosion', { frame: 0 });
+    this.x = centerX - this.w / 2;
+    this.y = centerY - this.h / 2;
+};
+
+Explosion.prototype = new Sprite();
+
+Explosion.prototype.step = function (dt) {
+    this.frame += 1;
+    if (this.frame >= 12) {
+        this.board.remove(this);
+    }
+};
 
 window.addEventListener('load', () => {
     window.events.$on('start-game', () => {
