@@ -528,118 +528,116 @@ const OBJECT_PLAYER_PROJECTILE = 2;
 const OBJECT_ENEMY = 4;
 const OBJECT_ENEMY_PROJECTILE = 8;
 
-/* eslint-disable */ 
-   var startGame = function() {
-     var ua = navigator.userAgent.toLowerCase();
-   
-     // Only 1 row of stars
-     if(ua.match(/android/)) {
-       Game.setBoard(0,new Starfield(50,0.6,100,true));
-     } else {
-       Game.setBoard(0,new Starfield(20,0.4,100,true));
-       Game.setBoard(1,new Starfield(50,0.6,100));
-       Game.setBoard(2,new Starfield(100,1.0,50));
-     }  
-     Game.setBoard(3,new TitleScreen("Food Invasion", 
-                                     "Press space bar to start playing",
-                                     playGame));
-   };
-   
-   var level1 = [
+
+const startGame = function () {
+    const ua = navigator.userAgent.toLowerCase();
+
+    // Only 1 row of stars
+    if (ua.match(/android/)) {
+        Game.setBoard(0, new Starfield(50, 0.6, 100, true));
+    } else {
+        Game.setBoard(0, new Starfield(20, 0.4, 100, true));
+        Game.setBoard(1, new Starfield(50, 0.6, 100));
+        Game.setBoard(2, new Starfield(100, 1.0, 50));
+    }
+    Game.setBoard(3, new TitleScreen('Food Invasion',
+        'Press space bar to start playing',
+        playGame));
+};
+
+const level1 = [
     // Start,   End, Gap,  Type,   Override
-     [ 0,      4000,  500, 'step' ],
-     [ 6000,   13000, 800, 'ltr' ],
-     [ 10000,  16000, 400, 'circle' ],
-     [ 17800,  20000, 500, 'straight', { x: 50 } ],
-     [ 18200,  20000, 500, 'straight', { x: 90 } ],
-     [ 18200,  20000, 500, 'straight', { x: 10 } ],
-     [ 22000,  25000, 400, 'wiggle', { x: 150 }],
-     [ 22000,  25000, 400, 'wiggle', { x: 100 }]
-   ];
-   
-   
-   
-   var playGame = function() {
-     var board = new GameBoard();
-     board.add(new PlayerShip());
-     board.add(new Level(level1,winGame));
-     Game.setBoard(3,board);
-     Game.setBoard(5,new GamePoints(0));
-   };
-   
-   var winGame = function() {
-     Game.setBoard(3,new TitleScreen("You win!", 
-                                     "Press fire to play again",
-                                     playGame));
-   };
-   
-   var loseGame = function() {
-     Game.setBoard(3,new TitleScreen("You lose!", 
-                                     "Press fire to play again",
-                                     playGame));
-   };
-   
-   var Starfield = function(speed,opacity,numStars,clear) {
-   
-     // Set up the offscreen canvas
-     var stars = document.createElement("canvas");
-     stars.width = Game.width; 
-     stars.height = Game.height;
-     var starCtx = stars.getContext("2d");
-   
-     var offset = 0;
-   
-     // If the clear option is set, 
-     // make the background black instead of transparent
-     if(clear) {
-       starCtx.fillStyle = "#000";
-       starCtx.fillRect(0,0,stars.width,stars.height);
-     }
-   
-     // Now draw a bunch of random 2 pixel
-     // rectangles onto the offscreen canvas
-     starCtx.fillStyle = "#FFF";
-     starCtx.globalAlpha = opacity;
-     for(var i=0;i<numStars;i++) {
-       starCtx.fillRect(Math.floor(Math.random()*stars.width),
-                        Math.floor(Math.random()*stars.height),
-                        2,
-                        2);
-     }
-   
-     // This method is called every frame
-     // to draw the starfield onto the canvas
-     this.draw = function(ctx) {
-       var intOffset = Math.floor(offset);
-       var remaining = stars.height - intOffset;
-   
-       // Draw the top half of the starfield
-       if(intOffset > 0) {
-         ctx.drawImage(stars,
-                   0, remaining,
-                   stars.width, intOffset,
-                   0, 0,
-                   stars.width, intOffset);
-       }
-   
-       // Draw the bottom half of the starfield
-       if(remaining > 0) {
-         ctx.drawImage(stars,
-                 0, 0,
-                 stars.width, remaining,
-                 0, intOffset,
-                 stars.width, remaining);
-       }
-     };
-   
-     // This method is called to update
-     // the starfield
-     this.step = function(dt) {
-       offset += dt * speed;
-       offset = offset % stars.height;
-     };
-   };
-   
+    [0, 4000, 500, 'step'],
+    [6000, 13000, 800, 'ltr'],
+    [10000, 16000, 400, 'circle'],
+    [17800, 20000, 500, 'straight', { x: 50 }],
+    [18200, 20000, 500, 'straight', { x: 90 }],
+    [18200, 20000, 500, 'straight', { x: 10 }],
+    [22000, 25000, 400, 'wiggle', { x: 150 }],
+    [22000, 25000, 400, 'wiggle', { x: 100 }],
+];
+
+
+const playGame = function () {
+    const board = new GameBoard();
+    board.add(new PlayerShip());
+    board.add(new Level(level1, winGame));
+    Game.setBoard(3, board);
+    Game.setBoard(5, new GamePoints(0));
+};
+
+const winGame = function () {
+    Game.setBoard(3, new TitleScreen('You win!',
+        'Press fire to play again',
+        playGame));
+};
+
+const loseGame = function () {
+    Game.setBoard(3, new TitleScreen('You lose!',
+        'Press fire to play again',
+        playGame));
+};
+
+const Starfield = function (speed, opacity, numStars, clear) {
+    // Set up the offscreen canvas
+    const stars = document.createElement('canvas');
+    stars.width = Game.width;
+    stars.height = Game.height;
+    const starCtx = stars.getContext('2d');
+
+    let offset = 0;
+
+    // If the clear option is set,
+    // make the background black instead of transparent
+    if (clear) {
+        starCtx.fillStyle = '#000';
+        starCtx.fillRect(0, 0, stars.width, stars.height);
+    }
+
+    // Now draw a bunch of random 2 pixel
+    // rectangles onto the offscreen canvas
+    starCtx.fillStyle = '#FFF';
+    starCtx.globalAlpha = opacity;
+    for (let i = 0; i < numStars; i += 1) {
+        starCtx.fillRect(Math.floor(Math.random() * stars.width),
+            Math.floor(Math.random() * stars.height),
+            2,
+            2);
+    }
+
+    // This method is called every frame
+    // to draw the starfield onto the canvas
+    this.draw = function (ctx) {
+        const intOffset = Math.floor(offset);
+        const remaining = stars.height - intOffset;
+
+        // Draw the top half of the starfield
+        if (intOffset > 0) {
+            ctx.drawImage(stars,
+                0, remaining,
+                stars.width, intOffset,
+                0, 0,
+                stars.width, intOffset);
+        }
+
+        // Draw the bottom half of the starfield
+        if (remaining > 0) {
+            ctx.drawImage(stars,
+                0, 0,
+                stars.width, remaining,
+                0, intOffset,
+                stars.width, remaining);
+        }
+    };
+
+    // This method is called to update
+    // the starfield
+    this.step = function (dt) {
+        offset += dt * speed;
+        offset %= stars.height;
+    };
+};
+/* eslint-disable */ 
    var PlayerShip = function() { 
      this.setup('ship', { vx: 0, reloadTime: 0.25, maxVel: 200 });
    
