@@ -637,68 +637,73 @@ const Starfield = function (speed, opacity, numStars, clear) {
         offset %= stars.height;
     };
 };
+
+const PlayerShip = function () {
+    this.setup('ship', { vx: 0, reloadTime: 0.25, maxVel: 200 });
+
+    this.reload = this.reloadTime;
+    this.x = Game.width / 2 - this.w / 2;
+    this.y = Game.height - Game.playerOffset - this.h;
+
+    this.step = function (dt) {
+        if (Game.keys.left) {
+            this.vx = -this.maxVel;
+        } else if (Game.keys.right) {
+            this.vx = this.maxVel;
+        } else {
+            this.vx = 0;
+        }
+
+        this.x += this.vx * dt;
+
+        if (this.x < 0) {
+            this.x = 0;
+        } else if (this.x > Game.width - this.w) {
+            this.x = Game.width - this.w;
+        }
+
+        this.reload -= dt;
+        if (Game.keys.fire && this.reload < 0) {
+            Game.keys.fire = false;
+            this.reload = this.reloadTime;
+
+            this.board.add(new PlayerMissile(this.x, this.y + this.h / 2));
+            this.board.add(new PlayerMissile(this.x + this.w, this.y + this.h / 2));
+        }
+    };
+};
+
+PlayerShip.prototype = new Sprite();
+PlayerShip.prototype.type = OBJECT_PLAYER;
+
+PlayerShip.prototype.hit = function (damage) {
+    if (this.board.remove(this)) {
+        loseGame();
+    }
+};
+
+
+const PlayerMissile = function (x, y) {
+    this.setup('missile', { vy: -700, damage: 10 });
+    this.x = x - this.w / 2;
+    this.y = y - this.h;
+};
+
+PlayerMissile.prototype = new Sprite();
+PlayerMissile.prototype.type = OBJECT_PLAYER_PROJECTILE;
+
+PlayerMissile.prototype.step = function (dt) {
+    this.y += this.vy * dt;
+    const collision = this.board.collide(this, OBJECT_ENEMY);
+    if (collision) {
+        collision.hit(this.damage);
+        this.board.remove(this);
+    } else if (this.y < -this.h) {
+        this.board.remove(this);
+    }
+};
+
 /* eslint-disable */ 
-   var PlayerShip = function() { 
-     this.setup('ship', { vx: 0, reloadTime: 0.25, maxVel: 200 });
-   
-     this.reload = this.reloadTime;
-     this.x = Game.width/2 - this.w / 2;
-     this.y = Game.height - Game.playerOffset - this.h;
-   
-     this.step = function(dt) {
-       if(Game.keys['left']) { this.vx = -this.maxVel; }
-       else if(Game.keys['right']) { this.vx = this.maxVel; }
-       else { this.vx = 0; }
-   
-       this.x += this.vx * dt;
-   
-       if(this.x < 0) { this.x = 0; }
-       else if(this.x > Game.width - this.w) { 
-         this.x = Game.width - this.w;
-       }
-   
-       this.reload-=dt;
-       if(Game.keys['fire'] && this.reload < 0) {
-         Game.keys['fire'] = false;
-         this.reload = this.reloadTime;
-   
-         this.board.add(new PlayerMissile(this.x,this.y+this.h/2));
-         this.board.add(new PlayerMissile(this.x+this.w,this.y+this.h/2));
-       }
-     };
-   };
-   
-   PlayerShip.prototype = new Sprite();
-   PlayerShip.prototype.type = OBJECT_PLAYER;
-   
-   PlayerShip.prototype.hit = function(damage) {
-     if(this.board.remove(this)) {
-       loseGame();
-     }
-   };
-   
-   
-   var PlayerMissile = function(x,y) {
-     this.setup('missile',{ vy: -700, damage: 10 });
-     this.x = x - this.w/2;
-     this.y = y - this.h; 
-   };
-   
-   PlayerMissile.prototype = new Sprite();
-   PlayerMissile.prototype.type = OBJECT_PLAYER_PROJECTILE;
-   
-   PlayerMissile.prototype.step = function(dt)  {
-     this.y += this.vy * dt;
-     var collision = this.board.collide(this,OBJECT_ENEMY);
-     if(collision) {
-       collision.hit(this.damage);
-       this.board.remove(this);
-     } else if(this.y < -this.h) { 
-         this.board.remove(this); 
-     }
-   };
-   
-   
    var Enemy = function(blueprint,override) {
      this.merge(this.baseParameters);
      this.setup(blueprint.sprite,blueprint);
