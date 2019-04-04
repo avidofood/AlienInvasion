@@ -1,9 +1,9 @@
 /* eslint-disable no-param-reassign */
 /* eslint-disable no-alert */
 /* eslint-disable func-names */
-import spritesImages from './images/sprites.png';
 import './base.css';
 import './polyfill';
+import spritesImages from './sprites';
 
 
 const Game = new function () {
@@ -128,9 +128,8 @@ const SpriteSheet = new function () {
 
     this.load = function (spriteData, callback) {
         this.map = spriteData;
-        this.image = new Image();
-        this.image.onload = callback;
-        this.image.src = spritesImages;
+        this.image = spritesImages; // loaded before on top!
+        callback();
     };
 
     this.draw = function (ctx, sprite, x, y, frame) {
