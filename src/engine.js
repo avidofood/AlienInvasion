@@ -3,6 +3,7 @@
 /* eslint-disable no-alert */
 /* eslint-disable func-names */
 import spritesImages from './sprites';
+import { enemies, Enemy } from './game';
 
 export const Game = new function () {
     const boards = [];
@@ -243,4 +244,197 @@ Sprite.prototype.draw = function (ctx) {
 
 Sprite.prototype.hit = function () {
     this.board.remove(this);
+};
+
+export const TitleScreen = function TitleScreen(title, subtitle, callback) {
+    let up = false;
+    // eslint-disable-next-line no-unused-vars
+    this.step = function (dt) {
+        if (!Game.keys.fire) up = true;
+        if (up && Game.keys.fire && callback) callback();
+    };
+
+    this.draw = function (ctx) {
+        ctx.fillStyle = '#FFFFFF';
+
+        ctx.font = 'bold 40px bangers';
+        const measure = ctx.measureText(title);
+        ctx.fillText(title, Game.width / 2 - measure.width / 2, Game.height / 2);
+
+        ctx.font = 'bold 20px bangers';
+        const measure2 = ctx.measureText(subtitle);
+        ctx.fillText(subtitle, Game.width / 2 - measure2.width / 2, Game.height / 2 + 40);
+    };
+};
+
+
+export const GameBoard = function () {
+    const board = this;
+
+    // The current list of objects
+    this.objects = [];
+    this.cnt = {};
+
+    // Add a new object to the object list
+    this.add = function (obj) {
+        obj.board = this;
+        this.objects.push(obj);
+        this.cnt[obj.type] = (this.cnt[obj.type] || 0) + 1;
+        return obj;
+    };
+
+    // Mark an object for removal
+    this.remove = function (obj) {
+        const idx = this.removed.indexOf(obj);
+        if (idx === -1) {
+            this.removed.push(obj);
+            return true;
+        }
+        return false;
+    };
+
+    // Reset the list of removed objects
+    this.resetRemoved = function () { this.removed = []; };
+
+    // Removed an objects marked for removal from the list
+    this.finalizeRemoved = function () {
+        for (let i = 0, len = this.removed.length; i < len; i += 1) {
+            const idx = this.objects.indexOf(this.removed[i]);
+            if (idx !== -1) {
+                this.cnt[this.removed[i].type] -= 1;
+                this.objects.splice(idx, 1);
+            }
+        }
+    };
+
+    // Call the same method on all current objects
+    this.iterate = function (funcName, ...args) {
+        for (let i = 0, len = this.objects.length; i < len; i += 1) {
+            const obj = this.objects[i];
+            obj[funcName](...args);
+        }
+    };
+
+    // Find the first object for which func is true
+    this.detect = function (func) {
+        for (let i = 0, len = this.objects.length; i < len; i += 1) {
+            if (func.call(this.objects[i])) return this.objects[i];
+        }
+        return false;
+    };
+
+    // Call step on all objects and them delete
+    // any object that have been marked for removal
+    this.step = function (dt) {
+        this.resetRemoved();
+        this.iterate('step', dt);
+        this.finalizeRemoved();
+    };
+
+    // Draw all the objects
+    this.draw = function (ctx) {
+        this.iterate('draw', ctx);
+    };
+
+    // Check for a collision between the
+    // bounding rects of two objects
+    this.overlap = function (o1, o2) {
+        return !((o1.y + o1.h - 1 < o2.y) || (o1.y > o2.y + o2.h - 1)
+             || (o1.x + o1.w - 1 < o2.x) || (o1.x > o2.x + o2.w - 1));
+    };
+
+    // Find the first object that collides with obj
+    // match against an optional type
+    this.collide = function (obj, type) {
+        return this.detect(function () {
+            if (obj !== this) {
+                // eslint-disable-next-line no-bitwise
+                const col = (!type || this.type & type) && board.overlap(obj, this);
+
+                return col ? this : false;
+            }
+            return undefined;
+        });
+    };
+};
+
+
+export const Level = function (levelData, callback) {
+    this.levelData = [];
+    for (let i = 0; i < levelData.length; i += 1) {
+        this.levelData.push(Object.create(levelData[i]));
+    }
+    this.t = 0;
+    this.callback = callback;
+};
+
+Level.prototype.step = function (dt) {
+    let idx = 0;
+    const remove = [];
+    let curShip = null;
+
+    // Update the current time offset
+    this.t += dt * 1000;
+
+    //   Start, End,  Gap, Type,   Override
+    // [ 0,     4000, 500, 'step', { x: 100 } ]
+    // eslint-disable-next-line no-cond-assign
+    while ((curShip = this.levelData[idx]) && (curShip[0] < this.t + 2000)) {
+        // Check if we've passed the end time
+        if (this.t > curShip[1]) {
+            remove.push(curShip);
+        } else if (curShip[0] < this.t) {
+            // Get the enemy definition blueprint
+            const enemy = enemies[curShip[3]];
+            const override = curShip[4];
+
+            // Add a new enemy with the blueprint and override
+            this.board.add(new Enemy(enemy, override));
+
+            // Increment the start time by the gap
+            curShip[0] += curShip[2];
+        }
+        idx += 1;
+    }
+
+    // Remove any objects from the levelData that have passed
+    for (let i = 0, len = remove.length; i < len; i += 1) {
+        const remIdx = this.levelData.indexOf(remove[i]);
+        if (remIdx !== -1) this.levelData.splice(remIdx, 1);
+    }
+
+    // If there are no more enemies on the board or in
+    // levelData, this level is done
+    if (this.levelData.length === 0 && this.board.cnt[OBJECT_ENEMY] === 0) {
+        if (this.callback) this.callback();
+    }
+};
+
+Level.prototype.draw = function (ctx) { };
+
+
+export const GamePoints = function () {
+    Game.points = 0;
+
+    const pointsLength = 8;
+
+    this.draw = function (ctx) {
+        ctx.save();
+        ctx.font = 'bold 18px arial';
+        ctx.fillStyle = '#FFFFFF';
+
+        const txt = `${Game.points}`;
+        let i = pointsLength - txt.length;
+        let zeros = '';
+
+        // eslint-disable-next-line no-cond-assign
+        while (i -= 1 > 0) {
+            zeros += '0';
+        }
+
+        ctx.fillText(zeros + txt, 10, 20);
+        ctx.restore();
+    };
+
+    this.step = function (dt) { };
 };
