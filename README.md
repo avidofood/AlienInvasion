@@ -1,6 +1,6 @@
 # 👾🥕 Alien Food Invasion
-[![Latest Version on NPM](https://img.shields.io/npm/v/%40pmochine%2Fvee-validate-laravel.svg?style=flat-square)](https://npmjs.com/package/%40pmochine%2Fvee-validate-laravel)
-[![Total Downloads on NPM](https://img.shields.io/npm/dt/%40pmochine%2Fvee-validate-laravel.svg)](https://www.npmjs.com/package/%40pmochine%2Fvee-validate-laravel)
+[![Latest Version on NPM](https://img.shields.io/npm/v/foodinvasion.svg?style=flat-square)](https://www.npmjs.com/package/foodinvasion)
+[![Total Downloads on NPM](https://img.shields.io/npm/dt/foodinvasion.svg)](https://www.npmjs.com/package/foodinvasion)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE.md)
 
 ![Alien Food Invasion](src/images/preview.jpg)
@@ -9,14 +9,14 @@
 
 ## Installation in 2 Steps*
 
-### 1: Install the package 💻 on [NPM](https://www.npmjs.com/package/@avidofood/foodinvasion)
+### 1: Install the package 💻 on [NPM](https://www.npmjs.com/package/foodinvasion)
 ```bash
-npm i @pmochine/foodinvasion
+npm i foodinvasion
 ```
 ### 2: Add the package in your main.js
 
 ```javascript
-import startPlaying from '/@avidofood/FoodInvasion';
+import startPlaying from 'foodinvasion';
 
 ...
 startPlaying();
@@ -61,7 +61,7 @@ Example in Vue:
 
 </template>
 <script>
-import startPlaying from '@modules/@avidofood/FoodInvasion/src/index';
+import startPlaying from 'foodinvasion';
 
 export default {
     data() {
