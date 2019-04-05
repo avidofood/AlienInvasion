@@ -3,7 +3,7 @@
 /* eslint-disable no-alert */
 /* eslint-disable func-names */
 import spritesImages from './sprites';
-import { enemies, Enemy } from './game';
+import { enemies, Enemy, OBJECT_ENEMY } from './game';
 
 export const Game = new function () {
     const boards = [];

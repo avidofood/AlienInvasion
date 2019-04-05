@@ -101,7 +101,7 @@ export const enemies = {
 
 const OBJECT_PLAYER = 1;
 const OBJECT_PLAYER_PROJECTILE = 2;
-const OBJECT_ENEMY = 4;
+export const OBJECT_ENEMY = 4;
 const OBJECT_ENEMY_PROJECTILE = 8;
 
 
