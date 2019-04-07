@@ -16,10 +16,13 @@ npm i foodinvasion
 ### 2: Add the package in your main.js
 
 ```javascript
-import startPlaying from 'foodinvasion';
+import { startPlaying, removeGame } from 'foodinvasion';
 
 ...
 startPlaying();
+
+//after game is done and you need to remove the listeners
+removeGame();
 ```
 
 
@@ -61,7 +64,7 @@ Example in Vue:
 
 </template>
 <script>
-import startPlaying from 'foodinvasion';
+import { startPlaying, removeGame } from 'foodinvasion';
 
 export default {
     data() {
@@ -82,6 +85,9 @@ export default {
             this.showGame = true;
         },
     },
+    beforeDestroy() {
+        removeGame();
+    }
 };
 </script>
 ```

@@ -7,6 +7,7 @@ import { enemies, Enemy, OBJECT_ENEMY } from './game';
 
 export const Game = new function () {
     const boards = [];
+    let stopGame = false;
 
     // Game Initialization
     this.initialize = function (canvasElementId, spriteData, callback) {
@@ -43,26 +44,33 @@ export const Game = new function () {
     this.keys = {};
 
     this.setupInput = function () {
-        window.addEventListener('keydown', (e) => {
-            if (KEY_CODES[e.keyCode]) {
-                Game.keys[KEY_CODES[e.keyCode]] = true;
-                e.preventDefault();
-            }
-        }, false);
+        window.addEventListener('keydown', this.keyDown, false);
 
-        window.addEventListener('keyup', (e) => {
-            if (KEY_CODES[e.keyCode]) {
-                Game.keys[KEY_CODES[e.keyCode]] = false;
-                e.preventDefault();
-            }
-        }, false);
+        window.addEventListener('keyup', this.keyUp, false);
     };
+
+    this.keyDown = function (e){
+        if (KEY_CODES[e.keyCode]) {
+            Game.keys[KEY_CODES[e.keyCode]] = true;
+            e.preventDefault();
+        }
+    }
+
+    this.keyUp = function (e){
+        if (KEY_CODES[e.keyCode]) {
+            Game.keys[KEY_CODES[e.keyCode]] = false;
+            e.preventDefault();
+        }
+    }
 
 
     let lastTime = new Date().getTime();
     const maxTime = 1 / 30;
     // Game Loop
     this.loop = function () {
+
+        if(stopGame) return;
+
         const curTime = new Date().getTime();
         requestAnimationFrame(Game.loop);
         let dt = (curTime - lastTime) / 1000;
@@ -119,6 +127,17 @@ export const Game = new function () {
         this.canvas.style.left = '0px';
         this.canvas.style.top = '0px';
     };
+
+    //after we are done with the game we delete all listeners
+    this.removeGame = function (){
+        stopGame = true;
+
+        window.removeEventListener('keydown', this.keyDown, false);
+
+        window.removeEventListener('keyup', this.keyUp, false);
+
+        this.canvas = null;
+    }
 }();
 
 

@@ -387,3 +387,7 @@ Explosion.prototype.step = function (dt) {
 export const startPlaying = function () {
     Game.initialize('game', sprites, startGame);
 };
+
+export const removeGame = function () {
+    Game.removeGame();
+};
