@@ -1,6 +1,6 @@
 {
   "name": "foodinvasion",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "description": "A simple game based on Aliens transformed to Food",
   "main": "src/index.js",
   "scripts": {
