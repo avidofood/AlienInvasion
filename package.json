@@ -1,6 +1,6 @@
 {
   "name": "foodinvasion",
-  "version": "1.0.6",
+  "version": "1.0.7",
   "description": "A simple game based on Aliens transformed to Food",
   "main": "src/index.js",
   "scripts": {
@@ -23,7 +23,7 @@
   },
   "homepage": "https://github.com/avidofood/FoodInvasion#readme",
   "devDependencies": {
-    "eslint": "^5.16.0",
-    "eslint-config-avidofood": "^1.0.1"
+    "eslint": "^6.8.0",
+    "eslint-config-avidofood": "^1.1.0"
   }
 }
